@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Trucksoft Portal</title>
+<style>
+    /* --- 1. THEME VARIABLES --- */
+    :root {
+        --brand-blue: #0076B6; 
+        --sky-accent: #00B0DF;
+        
+        /* LIGHT THEME */
+        --bg-color: #FFFFFF;
+        --bg-gradient: radial-gradient(circle at center, rgba(0, 176, 223, 0.08) 0%, #FFFFFF 70%);
+        --text-main: #1e293b;
+        --text-sub: #64748b;
+        --card-bg: #ffffff;
+        --card-border: #e2e8f0;
+        --card-shadow: rgba(0, 118, 182, 0.08);
+        --logo-filter: drop-shadow(0 10px 20px rgba(0,0,0,0.05));
+    }
+
+    /* DARK THEME */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg-color: #0f172a;
+            --bg-gradient: radial-gradient(circle at center, rgba(0, 176, 223, 0.05) 0%, #0f172a 80%);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --card-shadow: rgba(0, 0, 0, 0.3);
+            --logo-filter: brightness(0) invert(1) drop-shadow(0 0 15px rgba(255,255,255,0.1));
+        }
+    }
+
+    body { 
+        margin: 0; background-color: var(--bg-color); background-image: var(--bg-gradient);
+        height: 100vh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: var(--text-main); transition: all 0.3s ease;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+
+    /* --- TOGGLE BUTTON --- */
+    .view-switch {
+        position: fixed; top: 20px; right: 20px;
+        background: var(--card-bg); border: 1px solid var(--card-border);
+        color: var(--text-sub); padding: 8px 16px; border-radius: 20px;
+        cursor: pointer; font-size: 0.85rem; z-index: 200;
+        box-shadow: 0 5px 15px -5px var(--card-shadow);
+        transition: 0.2s; display: flex; align-items: center; gap: 8px;
+    }
+    .view-switch:hover { color: var(--brand-blue); border-color: var(--brand-blue); }
+
+    /* --- VIEW CONTAINERS --- */
+    .view-container {
+        display: none; width: 100%; height: 100%;
+        flex-direction: column; align-items: center; justify-content: center;
+    }
+    .active-view { display: flex; }
+
+    /* =========================================
+       VIEW 1: MODERN (CENTER STAGE)
+       ========================================= */
+    .center-stage { 
+        text-align: center; 
+        width: 100%; 
+        max-width: 600px; 
+        transform: translateY(-50px);
+        padding: 0 20px; /* Prevents content hitting edges */
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* CRITICAL FOR CENTERING CHILD ITEMS */
+    }
+    
+    .greeting {
+        font-size: 3.5rem; font-weight: 500; margin-bottom: 10px; letter-spacing: -0.03em;
+        background: linear-gradient(135deg, var(--brand-blue) 0%, var(--sky-accent) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        padding-bottom: 5px; /* Space for descenders */
+    }
+    .sub-greeting { font-size: 1.1rem; color: var(--text-sub); margin-bottom: 35px; }
+    
+    .main-logo { height: 80px; width: auto; margin-bottom: 40px; filter: var(--logo-filter); }
+    
+    /* --- SEARCH BAR FIXES --- */
+    .search-wrapper { 
+        width: 90%; /* 1. Fixes touching edges (leaves 5% gap on sides) */
+        max-width: 480px; /* Limits max width on desktop */
+        position: relative; 
+        margin: 0 auto; /* 2. Forces centering */
+    }
+    
+    .modern-input {
+        background: var(--card-bg); 
+        border: 2px solid var(--card-border); 
+        padding: 20px 25px; 
+        border-radius: 24px; 
+        width: 100%; 
+        font-size: 1.1rem;
+        color: var(--text-main); 
+        outline: none; 
+        text-align: center; 
+        box-shadow: 0 15px 40px -10px var(--card-shadow);
+        box-sizing: border-box; /* 3. Ensures padding doesn't break width */
+    }
+    .modern-input:focus { border-color: var(--sky-accent); }
+
+    /* --- DOCK --- */
+    .dock-container {
+        position: fixed; bottom: 40px; display: flex; gap: 12px; padding: 12px 20px;
+        background: var(--card-bg); backdrop-filter: blur(20px); border-radius: 20px;
+        border: 1px solid var(--card-border); box-shadow: 0 20px 50px -10px rgba(0,0,0,0.15);
+        z-index: 100;
+    }
+    .dock-item {
+        width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+        border-radius: 12px; transition: all 0.2s ease; color: var(--text-sub);
+        text-decoration: none;
+    }
+    .dock-item:hover { transform: translateY(-5px); color: var(--sky-accent); background: rgba(0, 176, 223, 0.1); }
+    .dock-item svg { width: 24px; height: 24px; fill: currentColor; }
+
+    /* =========================================
+       VIEW 2: LEGACY BENTO
+       ========================================= */
+    .legacy-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 20px;
+        max-width: 800px; width: 90%; padding: 20px;
+    }
+    
+    .bento-card {
+        background: var(--card-bg); border: 1px solid var(--card-border);
+        border-radius: 16px; padding: 25px 20px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-decoration: none; color: var(--text-main);
+        box-shadow: 0 4px 20px -5px var(--card-shadow);
+        transition: transform 0.2s, border-color 0.2s;
+        aspect-ratio: 1/1;
+    }
+    .bento-card:hover { transform: scale(1.03); border-color: var(--brand-blue); }
+    
+    .bento-icon { margin-bottom: 0px; color: var(--brand-blue); }
+    .bento-icon svg { width: 32px; height: 32px; fill: currentColor; }
+    .bento-text { font-weight: 600; font-size: 0.95rem; text-align: center; }
+    .span-2 { grid-column: span 2; aspect-ratio: 2/1; flex-direction: row; gap: 20px; }
+
+    /* --- MOBILE ADJUSTMENTS --- */
+    @media (max-width: 768px) {
+        .greeting { font-size: 2.2rem; }
+        .main-logo { height: 60px; margin-bottom: 30px; }
+        
+        /* Mobile Input Tweaks */
+        .modern-input { 
+            padding: 16px 20px; /* Smaller padding */
+            font-size: 1rem; 
+        }
+        
+        .dock-container { bottom: 20px; width: auto; max-width: 90%; padding: 10px 15px; gap: 8px; }
+        .dock-item { width: 42px; height: 42px; }
+        .legacy-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    }
+</style>
+</head>
+<body>
+
+    <button class="view-switch" onclick="toggleView()">
+        <span id="switchText">Switch to Legacy</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M12 4v16"/></svg>
+    </button>
+
+    <div id="modernView" class="view-container active-view">
+        <div class="center-stage">
+            <div id="greetingDisplay" class="greeting"></div>
+            <div id="subDisplay" class="sub-greeting"></div>
+            
+            <img src="TS-fl-logo.svg" class="main-logo" alt="Logo">
+            
+            <div class="search-wrapper">
+                <input type="text" class="modern-input" id="searchInput" autofocus>
+            </div>
+        </div>
+        <div class="dock-container" id="dock"></div>
+    </div>
+
+    <div id="legacyView" class="view-container">
+        <div style="text-align: center; margin-bottom: 30px;">
+             <img src="TS-fl-logo.svg" style="height: 50px; filter: var(--logo-filter);" alt="Logo">
+        </div>
+        <div class="legacy-grid" id="bentoGrid"></div>
+    </div>
+
+<script>
+    /* --- DATA --- */
+    const icons = {
+        home: `<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>`,
+        user: `<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`,
+        settings: `<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>`,
+        analytics: `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>`,
+        brand: `<img src= "chariot logo.png" style="height: 50px; filter: var(--logo-filter);" alt="Logo">`
+    };
+
+    const linkData = [
+        { name: "Home", url: "https://workplace.zoho.com", icon: icons.home, size: "" },
+        { name: "HR Portal", url: "https://trucksoftlimited.seamlesshrms.com/", icon: icons.user, size: "" },
+        { name: "Chariot", url: "https://telematics.trucksoftlimited.com/", icon: icons.brand, special: true, size: "span-2" },
+        { name: "Project Tracker", url: "https://telematics-project-tracker.netlify.app/", icon: icons.settings, size: "" },
+        { name: "Analytics Dashboard", url: "#", icon: icons.analytics, size: "" }
+    ];
+
+    /* --- APP LOGIC --- */
+    const STORAGE_KEY = 'trucksoft_user_v2'; 
+    let storedName = localStorage.getItem(STORAGE_KEY);
+
+    function init() {
+        if (!storedName) {
+            document.getElementById('greetingDisplay').innerText = "Hello.";
+            document.getElementById('searchInput').placeholder = "Type your name...";
+        } else {
+            setGreeting();
+        }
+        
+        const savedView = localStorage.getItem('trucksoft_view_mode');
+        if(savedView === 'legacy') toggleView(true);
+
+        renderApps();
+    }
+
+    function setGreeting() {
+        document.getElementById('greetingDisplay').innerText = `Hello, ${storedName}`;
+        document.getElementById('subDisplay').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        document.getElementById('searchInput').placeholder = "Where to?";
+    }
+
+    function toggleView(forceLegacy = false) {
+        const modern = document.getElementById('modernView');
+        const legacy = document.getElementById('legacyView');
+        const btnText = document.getElementById('switchText');
+
+        if (modern.classList.contains('active-view') || forceLegacy === true) {
+            modern.classList.remove('active-view');
+            legacy.classList.add('active-view');
+            btnText.innerText = "Switch to Modern";
+            localStorage.setItem('trucksoft_view_mode', 'legacy');
+        } else {
+            legacy.classList.remove('active-view');
+            modern.classList.add('active-view');
+            btnText.innerText = "Switch to Legacy";
+            localStorage.setItem('trucksoft_view_mode', 'modern');
+        }
+    }
+
+    function trackActivity(action, details) {
+        console.log(`[LOG] ${action}: ${details}`);
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const val = e.target.value.trim();
+            if (!val) return;
+
+            if (!storedName) {
+                localStorage.setItem(STORAGE_KEY, val);
+                storedName = val;
+                e.target.value = "";
+                setGreeting();
+            } else {
+                const match = linkData.find(l => l.name.toLowerCase().includes(val.toLowerCase()));
+                if (match) {
+                    trackActivity('NAVIGATE', match.name);
+                    window.location.href = match.url;
+                }
+            }
+        }
+    });
+
+    function renderApps() {
+        const dock = document.getElementById('dock');
+        const grid = document.getElementById('bentoGrid');
+
+        linkData.forEach(link => {
+            const aDock = document.createElement('a');
+            aDock.href = link.url; aDock.className = 'dock-item'; aDock.setAttribute('data-name', link.name);
+            aDock.innerHTML = link.icon;
+            dock.appendChild(aDock);
+
+            const aGrid = document.createElement('a');
+            aGrid.href = link.url; 
+            aGrid.className = `bento-card ${link.size}`;
+            aGrid.innerHTML = `<div class="bento-icon">${link.icon}</div><div class="bento-text">${link.name}</div>`;
+            grid.appendChild(aGrid);
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
