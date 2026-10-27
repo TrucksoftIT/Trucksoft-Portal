@@ -1,0 +1,20 @@
+# Local Portal stack — Postgres on host 5545 (avoid clash with AxleTIQ 5544 / native 5432)
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: portal
+      POSTGRES_PASSWORD: portal
+      POSTGRES_DB: trucksoft_portal
+    ports:
+      - "5545:5432"
+    volumes:
+      - portal_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portal -d trucksoft_portal"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  portal_pg:
