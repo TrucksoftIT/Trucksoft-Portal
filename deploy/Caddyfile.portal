@@ -1,0 +1,8 @@
+# Append to C:\Caddy\Caddyfile ONLY after portal.trucksoft.com.ng resolves to
+# the production host (otherwise Caddy retries a certificate it can't get).
+# Then: back up the Caddyfile, `caddy validate`, and reload via the admin API
+# on 127.0.0.1:2020 — never Restart-Service (PayFlow, CMSv6, Forms share it).
+portal.trucksoft.com.ng {
+	encode gzip zstd
+	reverse_proxy 127.0.0.1:8040
+}
