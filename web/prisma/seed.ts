@@ -49,20 +49,27 @@ async function main() {
     })
   }
 
+  // In production the admin PIN must come from the host (.env PORTAL_ADMIN_PIN):
+  // a default PIN written in this repo would let anyone in once PIN-only
+  // sign-in is on. Locally the old default is kept for convenience.
   const adminUser = 'portal.admin'
+  const adminPin =
+    process.env.PORTAL_ADMIN_PIN || (process.env.NODE_ENV === 'production' ? '' : 'change-me-now')
   const existingAdmin = await prisma.user.findUnique({ where: { username: adminUser } })
-  if (!existingAdmin) {
+  if (!existingAdmin && !adminPin) {
+    console.log('Skipped portal.admin: set PORTAL_ADMIN_PIN on the host to create it')
+  } else if (!existingAdmin) {
     await prisma.user.create({
       data: {
         username: adminUser,
         displayName: 'Portal Admin',
-        pinHash: await bcrypt.hash('change-me-now', 12),
+        pinHash: await bcrypt.hash(adminPin, 12),
         departments: ['IT'],
         allowedZohoEmails: [],
         isAdmin: true,
       },
     })
-    console.log('Created portal.admin — set PIN via admin UI; default PIN change-me-now')
+    console.log(`Created ${adminUser} (PIN from ${process.env.PORTAL_ADMIN_PIN ? 'PORTAL_ADMIN_PIN' : 'local default'})`)
   }
 
   console.log(
