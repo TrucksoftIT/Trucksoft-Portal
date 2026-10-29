@@ -57,9 +57,8 @@ export const DEFAULT_APPS: SeedApp[] = [
     url: 'https://axletiq.trucksoft.com.ng/',
     description: 'Maintenance requests, work orders and fleet health',
     logo: '/logos/chariot-orange.png',
-    signIn: 'SSO',
+    signIn: 'OWN_LOGIN',
     departments: ['OPERATIONS', 'MAINTENANCE', 'IT'],
-    comingSoon: true, // target host, not live yet
     sortOrder: 40,
   },
   {
@@ -73,12 +72,11 @@ export const DEFAULT_APPS: SeedApp[] = [
   },
   {
     name: 'ProjectHub',
-    url: 'https://projecthub.trucksoft.com.ng/',
+    url: 'https://trucksoft-projecthub-topaz.vercel.app/', // moves to projecthub.trucksoft.com.ng
     description: 'Projects, tasks and stand-ups',
     logo: '/logos/chariot-red.png',
     signIn: 'OWN_LOGIN',
     departments: ['OPERATIONS', 'IT'],
-    comingSoon: true, // host TBD
     sortOrder: 60,
   },
   {
@@ -186,12 +184,13 @@ export const DEFAULT_APPS: SeedApp[] = [
   },
   {
     name: 'Support Tickets',
-    url: 'https://erp.trucksoft.com.ng/support-tickets',
-    description: 'Raise and track IT support requests',
-    logo: '/logos/chariot-blue.png',
-    signIn: 'ERP_TOKEN',
-    departments: ['IT'],
-    sortOrder: 520,
+    url: 'https://support.trucksoft.com.ng/',
+    description: 'Report IT and telematics problems and follow the fix',
+    logo: '/logos/chariot-black.png',
+    signIn: 'OWN_LOGIN',
+    departments: ALL,
+    comingSoon: true, // IT/Telematics support app, being built
+    sortOrder: 75,
   },
   {
     name: 'Ideas',
@@ -257,7 +256,7 @@ export const DEFAULT_APPS: SeedApp[] = [
   },
   {
     name: 'SeamlessHR',
-    url: 'https://app.seamlesshr.com/',
+    url: 'https://trucksoftlimited.seamlesshrms.com/',
     description: 'Leave, payslips and HR requests',
     signIn: 'OWN_LOGIN',
     departments: ALL,
