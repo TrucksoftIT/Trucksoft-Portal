@@ -8,6 +8,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# NEXT_PUBLIC_* values are inlined into the client bundle at build time, so the
+# public app URL must be present during `npm run build`, not just at runtime.
+ARG NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 RUN npx prisma generate && npm run build
 
 FROM node:20-alpine AS runner
@@ -24,5 +28,8 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 USER portal
 EXPOSE 3000
 ENV PORT=3000
-ENV HOSTNAME=127.0.0.1
+# Bind to all interfaces INSIDE the container; the host publishes only to
+# 127.0.0.1:<port>, so loopback-only public exposure is preserved. With
+# 127.0.0.1 here the Next standalone server is unreachable on its published port.
+ENV HOSTNAME=0.0.0.0
 CMD ["node", "server.js"]

@@ -34,12 +34,19 @@ jobs:
         run: |
           short="${GITHUB_SHA::12}"
           echo "tag=sha-${short}" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
+            echo "app_url=https://portal-staging.trucksoft.com.ng" >> "$GITHUB_OUTPUT"
+          else
+            echo "app_url=https://portal.trucksoft.com.ng" >> "$GITHUB_OUTPUT"
+          fi
           echo "### portal image" >> "$GITHUB_STEP_SUMMARY"
           echo "\`ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/trucksoft-portal:sha-${short}\`" >> "$GITHUB_STEP_SUMMARY"
       - uses: docker/build-push-action@v6
         with:
           context: web
           push: true
+          build-args: |
+            NEXT_PUBLIC_APP_URL=${{ steps.tags.outputs.app_url }}
           tags: |
             ghcr.io/${{ github.repository_owner }}/trucksoft-portal:${{ steps.tags.outputs.tag }}
           cache-from: type=gha
