@@ -34,6 +34,8 @@ jobs:
         run: |
           short="${GITHUB_SHA::12}"
           echo "tag=sha-${short}" >> "$GITHUB_OUTPUT"
+          # Image names must be lowercase; the org is "TrucksoftIT".
+          echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/trucksoft-portal" >> "$GITHUB_OUTPUT"
           if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
             echo "app_url=https://portal-staging.trucksoft.com.ng" >> "$GITHUB_OUTPUT"
           else
@@ -48,6 +50,6 @@ jobs:
           build-args: |
             NEXT_PUBLIC_APP_URL=${{ steps.tags.outputs.app_url }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/trucksoft-portal:${{ steps.tags.outputs.tag }}
+            ${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
