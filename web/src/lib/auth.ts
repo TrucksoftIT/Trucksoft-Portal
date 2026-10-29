@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 import bcrypt from 'bcryptjs'
-import type { Department } from '@prisma/client'
+import type { AccessLevel, Department } from '@prisma/client'
 import { prisma } from './db'
 
 const COOKIE = 'ts_portal_session'
@@ -10,9 +10,28 @@ const DOMAIN = 'trucksoft.com.ng'
 export type Session = {
   userId: string
   username: string
+  displayName: string
+  /** Zoho gate mailbox; 'pin-only' or 'demo' when signed in without the gate. */
   zohoEmail: string
   departments: Department[]
+  level: AccessLevel
   isAdmin: boolean
+  /** Demo persona session: no vault, never admin. */
+  demo: boolean
+}
+
+/** One-click demo personas are offered (no Zoho, no PIN). */
+export function demoLoginEnabled(): boolean {
+  return process.env.DEMO_LOGIN === '1'
+}
+
+/** Username + PIN without the Zoho gate — interim until Zoho OAuth is configured. */
+export function pinOnlyLoginEnabled(): boolean {
+  return process.env.PIN_ONLY_LOGIN === '1'
+}
+
+export function zohoConfigured(): boolean {
+  return Boolean(process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET)
 }
 
 function secret() {
@@ -60,12 +79,16 @@ export async function getSession(): Promise<Session | null> {
   if (!token) return null
   try {
     const { payload } = await jwtVerify(token, secret())
+    const demo = Boolean(payload.demo)
     return {
       userId: String(payload.userId),
       username: String(payload.username),
+      displayName: String(payload.displayName || payload.username),
       zohoEmail: String(payload.zohoEmail),
       departments: (payload.departments as Department[]) || [],
-      isAdmin: Boolean(payload.isAdmin),
+      level: payload.level === 'HEAD' ? 'HEAD' : 'STAFF',
+      isAdmin: !demo && Boolean(payload.isAdmin),
+      demo,
     }
   } catch {
     return null
@@ -77,6 +100,13 @@ export async function requireSession(): Promise<Session> {
   if (!s) throw new Error('UNAUTHORIZED')
   const user = await prisma.user.findUnique({ where: { id: s.userId } })
   if (!user || user.disabledAt) throw new Error('UNAUTHORIZED')
+  return s
+}
+
+/** Like requireSession, but refuses demo personas (vault, admin, anything with real secrets). */
+export async function requireRealSession(): Promise<Session> {
+  const s = await requireSession()
+  if (s.demo) throw new Error('DEMO_FORBIDDEN')
   return s
 }
 

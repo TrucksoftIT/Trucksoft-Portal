@@ -1,19 +1,23 @@
-import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { Archivo } from 'next/font/google'
 import './globals.css'
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
+// Variable Archivo with its width axis (62–125%) for expanded headings.
+const archivo = Archivo({ variable: '--font-archivo', subsets: ['latin'], axes: ['wdth'] })
 
 export const metadata: Metadata = {
   title: 'TruckSoft Portal',
-  description: 'Staff hub for TruckSoft internal systems',
+  description: 'One place to open every TruckSoft app and tool you use at work',
+}
+
+export const viewport: Viewport = {
+  themeColor: '#EDEFF2',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-slate-950 text-slate-100 antialiased`}>
+      <body className={`${archivo.variable} min-h-screen bg-concrete font-sans text-ink antialiased`}>
         {children}
       </body>
     </html>

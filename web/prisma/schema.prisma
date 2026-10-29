@@ -16,14 +16,26 @@ enum Department {
   TELEMATICS
 }
 
+/// Staff see their departments' everyday apps; heads also see the
+/// head-only tiles (see AppCatalog.headOnlyIn). Portal admins (User.isAdmin)
+/// see everything regardless of level.
+enum AccessLevel {
+  STAFF
+  HEAD
+}
+
 model User {
   id                 String       @id @default(cuid())
   username           String       @unique
   displayName        String
   pinHash            String
   departments        Department[]
+  level              AccessLevel  @default(STAFF)
   allowedZohoEmails  String[]
   isAdmin            Boolean      @default(false)
+  /// Demo persona: reachable only through the one-click demo sign-in (when
+  /// DEMO_LOGIN=1), never through username/PIN, never admin, no vault.
+  isDemo             Boolean      @default(false)
   disabledAt         DateTime?
   failedPinAttempts  Int          @default(0)
   lockedUntil        DateTime?
@@ -39,8 +51,22 @@ model AppCatalog {
   name        String
   url         String
   description String?
+  /// Icon hint (lucide-react name) for the tile glyph
+  icon        String?
+  /// Tile logo under /public (e.g. /logos/chariot-blue.png). Null renders a
+  /// monogram — used for third-party tools so the TruckSoft mark isn't lent out.
+  logo        String?
+  /// Departments where only heads (and admins) see this tile; staff in other
+  /// listed departments still see it.
+  headOnlyIn  Department[] @default([])
+  /// How a user signs in: ERP_TOKEN | SSO | OWN_LOGIN | VAULT | NONE
+  signIn      String       @default("ERP_TOKEN")
   departments Department[]
+  /// Level gate: when true, only IT dept (or portal admins) see the tile
+  itOnly      Boolean      @default(false)
   external    Boolean      @default(false)
+  /// Not yet hostable — render as a disabled "coming soon" tile, not a dead link
+  comingSoon  Boolean      @default(false)
   sortOrder   Int          @default(0)
   active      Boolean      @default(true)
   createdAt   DateTime     @default(now())

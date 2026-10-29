@@ -51,21 +51,21 @@ export default function PickUserPage() {
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-6">
       <div>
         <h1 className="text-2xl font-semibold">Choose your username</h1>
-        <p className="mt-2 text-sm text-slate-400">
-          Company gate: <span className="text-cyan-300">{zohoEmail || '…'}</span>
+        <p className="mt-2 text-sm text-muted">
+          Company gate: <span className="text-brand">{zohoEmail || '…'}</span>
         </p>
       </div>
       {error ? (
-        <p className="rounded-lg border border-red-500/40 bg-red-950/40 px-3 py-2 text-sm text-red-200">
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           {error}
         </p>
       ) : null}
       <form onSubmit={submit} className="flex flex-col gap-4">
         {users.length > 0 ? (
           <label className="text-sm">
-            <span className="text-slate-400">Username</span>
+            <span className="text-muted">Username</span>
             <select
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"
+              className="mt-1 w-full rounded-lg border border-line bg-paper px-3 py-2"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             >
@@ -78,9 +78,9 @@ export default function PickUserPage() {
           </label>
         ) : (
           <label className="text-sm">
-            <span className="text-slate-400">Username</span>
+            <span className="text-muted">Username</span>
             <input
-              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"
+              className="mt-1 w-full rounded-lg border border-line bg-paper px-3 py-2"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
@@ -89,11 +89,11 @@ export default function PickUserPage() {
           </label>
         )}
         <label className="text-sm">
-          <span className="text-slate-400">PIN</span>
+          <span className="text-muted">PIN</span>
           <input
             type="password"
             inputMode="numeric"
-            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-line bg-paper px-3 py-2"
             value={pin}
             onChange={(e) => setPin(e.target.value)}
             autoComplete="current-password"
@@ -104,7 +104,7 @@ export default function PickUserPage() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-xl bg-cyan-500 px-4 py-3 text-sm font-semibold text-slate-950 hover:bg-cyan-400 disabled:opacity-50"
+          className="rounded-xl bg-brand px-4 py-3 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-50"
         >
           {loading ? 'Unlocking…' : 'Unlock portal'}
         </button>

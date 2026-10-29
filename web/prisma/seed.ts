@@ -1,17 +1,52 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import { DEFAULT_APPS } from '../src/lib/catalog-seed'
+import { randomBytes } from 'node:crypto'
+import { DEFAULT_APPS, DEMO_PERSONAS } from '../src/lib/catalog-seed'
 
 const prisma = new PrismaClient()
 
+// Fields a catalog entry may omit; reset them on update so removing e.g.
+// comingSoon from the seed actually takes effect on an existing row.
+const APP_DEFAULTS = {
+  description: null,
+  icon: null,
+  logo: null,
+  headOnlyIn: [],
+  itOnly: false,
+  external: false,
+  comingSoon: false,
+  sortOrder: 0,
+  active: true,
+}
+
 async function main() {
   for (const app of DEFAULT_APPS) {
+    const data = { ...APP_DEFAULTS, ...app }
     const existing = await prisma.appCatalog.findFirst({ where: { name: app.name } })
     if (existing) {
-      await prisma.appCatalog.update({ where: { id: existing.id }, data: app })
+      await prisma.appCatalog.update({ where: { id: existing.id }, data })
     } else {
-      await prisma.appCatalog.create({ data: app })
+      await prisma.appCatalog.create({ data })
     }
+  }
+  const retired = await prisma.appCatalog.updateMany({
+    where: { name: { notIn: DEFAULT_APPS.map((a) => a.name) }, active: true },
+    data: { active: false },
+  })
+
+  // Demo personas: no usable PIN (random hash), only reachable via /api/auth/demo.
+  for (const p of DEMO_PERSONAS) {
+    await prisma.user.upsert({
+      where: { username: p.username },
+      update: { displayName: p.displayName, departments: p.departments, level: p.level, isDemo: true, isAdmin: false },
+      create: {
+        ...p,
+        pinHash: await bcrypt.hash(randomBytes(24).toString('hex'), 12),
+        allowedZohoEmails: [],
+        isDemo: true,
+        isAdmin: false,
+      },
+    })
   }
 
   const adminUser = 'portal.admin'
@@ -30,8 +65,9 @@ async function main() {
     console.log('Created portal.admin — set PIN via admin UI; default PIN change-me-now')
   }
 
-  // Demo shared-mailbox binding example (disabled by default — enable by setting emails)
-  console.log(`Seeded ${DEFAULT_APPS.length} catalog apps`)
+  console.log(
+    `Seeded ${DEFAULT_APPS.length} catalog apps (${retired.count} retired), ${DEMO_PERSONAS.length} demo personas`,
+  )
 }
 
 main()

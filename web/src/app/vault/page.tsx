@@ -75,35 +75,35 @@ export default function VaultPage() {
     <main className="mx-auto max-w-3xl px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Credential vault</h1>
-        <Link href="/hub" className="text-sm text-cyan-400 hover:underline">
+        <Link href="/hub" className="text-sm text-brand hover:underline">
           ← Hub
         </Link>
       </div>
-      {error ? <p className="mb-4 text-sm text-red-300">{error}</p> : null}
+      {error ? <p className="mb-4 text-sm text-red-700">{error}</p> : null}
 
-      <form onSubmit={create} className="mb-10 space-y-3 rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-        <h2 className="text-sm font-semibold text-slate-300">Add entry</h2>
+      <form onSubmit={create} className="mb-10 space-y-3 rounded-2xl border border-line bg-paper p-4">
+        <h2 className="text-sm font-semibold text-ink">Add entry</h2>
         <input
-          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm"
           placeholder="Title"
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
           required
         />
         <input
-          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm"
           placeholder="URL"
           value={form.url}
           onChange={(e) => setForm({ ...form, url: e.target.value })}
         />
         <input
-          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm"
           placeholder="Username hint"
           value={form.usernameHint}
           onChange={(e) => setForm({ ...form, usernameHint: e.target.value })}
         />
         <input
-          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm"
           placeholder="Secret / password"
           type="password"
           value={form.secret}
@@ -112,7 +112,7 @@ export default function VaultPage() {
         />
         <div className="flex flex-wrap gap-3 text-sm">
           <select
-            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+            className="rounded-lg border border-line bg-paper px-3 py-2"
             value={form.scope}
             onChange={(e) => setForm({ ...form, scope: e.target.value as 'PRIVATE' | 'DEPARTMENT' })}
           >
@@ -121,7 +121,7 @@ export default function VaultPage() {
           </select>
           {form.scope === 'DEPARTMENT' ? (
             <select
-              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+              className="rounded-lg border border-line bg-paper px-3 py-2"
               value={form.department}
               onChange={(e) => setForm({ ...form, department: e.target.value })}
             >
@@ -132,7 +132,7 @@ export default function VaultPage() {
               ))}
             </select>
           ) : null}
-          <button type="submit" className="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950">
+          <button type="submit" className="rounded-lg bg-brand px-4 py-2 font-semibold text-white">
             Save
           </button>
         </div>
@@ -140,17 +140,17 @@ export default function VaultPage() {
 
       <ul className="space-y-3">
         {entries.map((e) => (
-          <li key={e.id} className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+          <li key={e.id} className="rounded-xl border border-line bg-paper p-4">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <p className="font-medium">{e.title}</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted">
                   {e.scope}
                   {e.department ? ` · ${e.department}` : ''}
                   {e.usernameHint ? ` · ${e.usernameHint}` : ''}
                 </p>
                 {e.url ? (
-                  <a href={e.url} className="text-xs text-cyan-400 hover:underline" target="_blank" rel="noreferrer">
+                  <a href={e.url} className="text-xs text-brand hover:underline" target="_blank" rel="noreferrer">
                     {e.url}
                   </a>
                 ) : null}
@@ -158,13 +158,13 @@ export default function VaultPage() {
               <button
                 type="button"
                 onClick={() => revealSecret(e.id)}
-                className="rounded-lg border border-slate-600 px-3 py-1.5 text-xs hover:bg-slate-800"
+                className="rounded-lg border border-line px-3 py-1.5 text-xs hover:bg-concrete"
               >
                 Reveal (30s)
               </button>
             </div>
             {reveal?.id === e.id ? (
-              <p className="mt-3 break-all rounded bg-slate-950 px-3 py-2 font-mono text-sm text-amber-200">
+              <p className="mt-3 break-all rounded bg-paper px-3 py-2 font-mono text-sm text-ink">
                 {reveal.secret}
               </p>
             ) : null}

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { requireSession, audit } from '@/lib/auth'
+import { requireRealSession as requireSession, audit } from '@/lib/auth'
 import { encryptSecret, decryptSecret } from '@/lib/crypto'
 import type { Department } from '@prisma/client'
+
+// Every handler uses requireRealSession: demo personas never reach the vault.
 
 export async function GET() {
   try {

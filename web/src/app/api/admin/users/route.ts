@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { requireSession, hashPin, audit } from '@/lib/auth'
-import type { Department } from '@prisma/client'
+import { requireRealSession, hashPin, audit } from '@/lib/auth'
+import type { AccessLevel, Department } from '@prisma/client'
 
 async function requireAdmin() {
-  const s = await requireSession()
+  const s = await requireRealSession()
   if (!s.isAdmin) throw new Error('FORBIDDEN')
   return s
 }
@@ -19,8 +19,10 @@ export async function GET() {
         username: true,
         displayName: true,
         departments: true,
+        level: true,
         allowedZohoEmails: true,
         isAdmin: true,
+        isDemo: true,
         disabledAt: true,
         createdAt: true,
       },
@@ -41,6 +43,7 @@ export async function POST(req: NextRequest) {
       displayName?: string
       pin?: string
       departments?: Department[]
+      level?: AccessLevel
       allowedZohoEmails?: string[]
       isAdmin?: boolean
     }
@@ -54,6 +57,7 @@ export async function POST(req: NextRequest) {
         displayName: body.displayName,
         pinHash: await hashPin(body.pin),
         departments: body.departments || [],
+        level: body.level === 'HEAD' ? 'HEAD' : 'STAFF',
         allowedZohoEmails: (body.allowedZohoEmails || []).map((e) => e.toLowerCase()),
         isAdmin: Boolean(body.isAdmin),
       },
