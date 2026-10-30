@@ -79,10 +79,13 @@ volumes:
   portal_pg:
 EOF
 
-docker compose pull -q
+# Pull from GHCR; an image already loaded on the host (e.g. copied over SSH
+# with `docker save | docker load`) is used if the registry refuses.
+docker compose pull -q --ignore-pull-failures
+docker image inspect "ghcr.io/trucksoftit/trucksoft-portal:$TAG" >/dev/null 2>&1   || { echo "Image $TAG is neither pullable nor loaded on this host." >&2; exit 1; }
 docker compose up -d db
-docker compose run --rm web prisma migrate deploy
-docker compose run --rm web tsx prisma/seed.ts
+docker compose run --rm -T web prisma migrate deploy </dev/null
+docker compose run --rm -T web tsx prisma/seed.ts </dev/null
 docker compose up -d web
 
 for _ in $(seq 1 30); do
