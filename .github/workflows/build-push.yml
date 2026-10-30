@@ -37,9 +37,9 @@ jobs:
           # Image names must be lowercase; the org is "TrucksoftIT".
           echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/trucksoft-portal" >> "$GITHUB_OUTPUT"
           if [ "${{ github.event.inputs.environment }}" = "staging" ]; then
-            echo "app_url=https://portal-staging.trucksoft.com.ng" >> "$GITHUB_OUTPUT"
+            echo "app_url=https://portals-staging.trucksoft.com.ng" >> "$GITHUB_OUTPUT"
           else
-            echo "app_url=https://portal.trucksoft.com.ng" >> "$GITHUB_OUTPUT"
+            echo "app_url=https://portals.trucksoft.com.ng" >> "$GITHUB_OUTPUT"
           fi
           echo "### portal image" >> "$GITHUB_STEP_SUMMARY"
           echo "\`ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/trucksoft-portal:sha-${short}\`" >> "$GITHUB_STEP_SUMMARY"

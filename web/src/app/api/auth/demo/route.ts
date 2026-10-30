@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { appUrl } from '@/lib/app-url'
 import { prisma } from '@/lib/db'
 import { audit, createSession, demoLoginEnabled } from '@/lib/auth'
 
@@ -8,7 +9,7 @@ import { audit, createSession, demoLoginEnabled } from '@/lib/auth'
  * never grants admin. Posted from a plain <form>, so it answers with a 303.
  */
 export async function POST(req: NextRequest) {
-  const base = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin
+  const base = appUrl()
   if (!demoLoginEnabled()) {
     return NextResponse.redirect(new URL('/login?error=demo_off', base), 303)
   }

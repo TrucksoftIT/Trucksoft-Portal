@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { appUrl } from '@/lib/app-url'
 import { randomBytes } from 'crypto'
 import { zohoAuthorizeUrl } from '@/lib/zoho'
 
@@ -17,6 +18,6 @@ export async function GET() {
     return res
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Zoho not configured'
-    return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(msg)}`, process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'))
+    return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(msg)}`, appUrl()))
   }
 }

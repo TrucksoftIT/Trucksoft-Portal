@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { appUrl } from '@/lib/app-url'
 import { exchangeZohoCode } from '@/lib/zoho'
 import { isCompanyEmail, setZohoGate, audit } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
-  const base = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const base = appUrl()
   const code = req.nextUrl.searchParams.get('code')
   const state = req.nextUrl.searchParams.get('state')
   const expected = req.cookies.get('ts_portal_oauth_state')?.value

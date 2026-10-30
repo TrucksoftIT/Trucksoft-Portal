@@ -40,6 +40,6 @@ After editing `.env`: `cd /srv/portal && docker compose up -d web`.
 
 ## Public hostname
 
-`portal.trucksoft.com.ng` must resolve to the production host first. Then add
+`portals.trucksoft.com.ng` must resolve to the production host first. Then add
 `deploy/Caddyfile.portal` to `C:\Caddy\Caddyfile`, validate, and reload via the
 admin API on `127.0.0.1:2020` (see the platform's `docs/ops/SERVER_FOR_AGENTS.md`).
